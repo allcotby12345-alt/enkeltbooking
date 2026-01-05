@@ -5,6 +5,16 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 });
 
 export default async function handler(req, res) {
+  // CORS - tillat Webflow-siden din å kalle API-et
+  res.setHeader("Access-Control-Allow-Origin", "https://www.enkeltbooking.no");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  // Preflight (nettleseren sender OPTIONS først)
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Use POST" });
   }
