@@ -18,7 +18,9 @@ export default async function handler(req, res) {
         .json({ error: "Missing/invalid stripeAccountId (acct_...)" });
     }
 
-    const baseUrl = process.env.PUBLIC_BASE_URL || "http://localhost:3000";
+    const baseUrl =
+      process.env.PUBLIC_BASE_URL ||
+      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
 
     // depositum i øre. Default = 50000 (500 kr)
     const amount = Number(process.env.DEPOSIT_AMOUNT_ORE || 50000);
