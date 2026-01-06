@@ -1,4 +1,5 @@
 ﻿import Stripe from "stripe";
+import { clinics } from "../../lib/clinics";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: "2024-06-20",
@@ -26,6 +27,17 @@ export default async function handler(req, res) {
       return res
         .status(400)
         .json({ error: "Missing/invalid stripeAccountId (acct_...)" });
+    }
+
+    // ✅ NYTT: sjekk at klinikken finnes + er aktiv
+    const clinic = clinics[stripeAccountId];
+
+    if (!clinic) {
+      return res.status(403).json({ error: "Unknown clinic" });
+    }
+
+    if (clinic.active === false) {
+      return res.status(403).json({ error: "Clinic is inactive" });
     }
 
     const baseUrl =
@@ -61,7 +73,7 @@ export default async function handler(req, res) {
           },
         ],
 
-        // VIKTIG: dette er det webhooken din leser
+        // webhooken leser dette
         metadata: {
           stripeAccountId,
           clinicName: safeClinicName,
